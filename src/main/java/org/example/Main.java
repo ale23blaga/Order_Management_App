@@ -1,17 +1,51 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import org.example.Model.Student;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Main {
+    private final static String findStatementString = "SELECT * FROM student WHERE id = ?";
+
+    public static void main(String[] args) {
+        Student s = findByID(1);
+        if (s != null) {
+            System.out.println("Student found: " + s.getName());
+        } else {
+            System.out.println("Student not found.");
         }
+    }
+
+    public static Student findByID(int studentId) {
+        Student toReturn = null;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement findStatement = null;
+        ResultSet rs = null;
+
+        try {
+            findStatement = dbConnection.prepareStatement(findStatementString);
+            findStatement.setInt(1, studentId);
+            rs = findStatement.executeQuery();
+
+            if (rs.next()) {
+                toReturn = new Student();
+                toReturn.setId(rs.getInt("id"));
+                toReturn.setName(rs.getString("name"));
+                toReturn.setAddress(rs.getString("address"));
+                toReturn.setEmail(rs.getString("email"));
+                toReturn.setAge(rs.getInt("age"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionFactory.close(rs);
+            ConnectionFactory.close(findStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+
+        return toReturn;
     }
 }
