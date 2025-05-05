@@ -7,6 +7,16 @@ public class Student {
     private String email;
     private int age;
 
+    public Student() {}
+
+    public Student(int id, String name, String address, String email, int age) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.age = age;
+    }
+
     // Getters & Setters
     public int getId() {
         return id;

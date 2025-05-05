@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.Connection.ConnectionFactory;
 import org.example.Model.Student;
 
 import java.sql.Connection;
@@ -11,7 +12,7 @@ public class Main {
     private final static String findStatementString = "SELECT * FROM student WHERE id = ?";
 
     public static void main(String[] args) {
-        Student s = findByID(1);
+        Student s = findByID(2);
         if (s != null) {
             System.out.println("Student found: " + s.getName());
         } else {

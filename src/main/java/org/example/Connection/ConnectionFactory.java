@@ -1,7 +1,6 @@
-package org.example;
+package org.example.Connection;
 
 import java.sql.*;
-import java.util.Collection;
 import java.util.logging.Logger;
 
 public class ConnectionFactory {
