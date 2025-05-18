@@ -10,7 +10,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data access object for bill records.
+ * <p>
+ * Bills are immutable and stored only via insert. Updates and deletes are not supported.
+ */
 public class BillDAO extends AbstractDAO<Bill> {
+    /**
+     * Inserts a new bill into the log table.
+     *
+     * @param bill the bill to insert
+     */
     public void insert(Bill bill) {
         String sql = "INSERT INTO bill (orderId, clientName, productName, quantity, totalPrice) VALUES (?, ?, ?, ?, ?)";
 
@@ -26,6 +36,11 @@ public class BillDAO extends AbstractDAO<Bill> {
         }
     }
 
+    /**
+     * Retrieves all bills from the log table.
+     *
+     * @return list of all bills
+     */
     public List<Bill> findAll(){
         List<Bill> bills = new ArrayList<>();
         String sql = "SELECT * FROM bill";

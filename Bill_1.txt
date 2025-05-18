@@ -1,0 +1,6 @@
+--- BILL RECEIPT ---
+Client: Bob Johnson
+Product: Phone
+Quantity: 1
+Total: 500.0
+---------------------

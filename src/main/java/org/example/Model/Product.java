@@ -1,5 +1,9 @@
 package org.example.Model;
 
+/**
+ * Represents a product that can be ordered.
+ * Includes name, quantity in stock, price, and status.
+ */
 public class Product {
     private int id;
     private String name;

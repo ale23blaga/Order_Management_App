@@ -10,6 +10,9 @@ import java.util.List;
 
 /**
  * Business Logic Layer for Orders.
+ * <p>
+ *     Delegates data access to {@link OrderDAO} and performs validation or filtration.
+ * </p>
  */
 public class OrderBLL {
     private final OrderDAO orderDAO = new OrderDAO();
@@ -17,10 +20,21 @@ public class OrderBLL {
     private final ClientDAO clientDAO = new ClientDAO();
     private final BillDAO billDAO = new BillDAO();
 
+    /**
+     * Retrieves all Orders, including soft-deleted ones.
+     *
+     * @return list of all Orders
+     */
     public List<Orders> getAllOrders() {
         return orderDAO.findAll();
     }
 
+    /**
+     * Attempts to place an order.
+     * Checks if there is enough stock, inserts the order, updates product quantity and generates a corresponding bill.
+     * @param order the order to place
+     * @return status message indicating success or error
+     */
     public String placeOrder(Orders order) {
         Product product = productDAO.findById(order.getProductId());
         Client client = clientDAO.findById(order.getClientId());

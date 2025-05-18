@@ -15,11 +15,19 @@ import java.util.logging.Logger;
 import org.example.Connection.ConnectionFactory;
 import org.example.Model.Status;
 
+/**
+ * A generic abstract class that provides basic CRUD operations for any type T.
+ * Uses reflection to dynamically build SQL queries and populate objects.
+ * @param <T> tehe model type this DAO will oeprate on
+ */
 public class AbstractDAO <T>{
     protected static final Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
 
     private final Class<T> type;
-    // doua metode pt reflexie una pt cap de tabel si una pt populare ! fa metodele mai mici
+
+    /**
+     * Construct an AbstractDAO and determines the actual class type fo T at runtime.
+     */
     @SuppressWarnings("unchecked")
     public AbstractDAO() {
         this.type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -45,6 +53,10 @@ public class AbstractDAO <T>{
         return sb.toString();
     }
 
+    /**
+     * Retrieves all records from the table corresponding to type T.
+     * @return a list of all objects of type T from the database
+     */
     public List<T> findAll(){
         List<T> list = new ArrayList<>();
         Connection connection = null;
@@ -67,6 +79,11 @@ public class AbstractDAO <T>{
         return list;
     }
 
+    /**
+     * Retrieves a single object by its ID from the database.
+     * @param id the ID of the object
+     * @return the foudn object, or null if not found
+     */
     public T findById(int id){
         Connection connection = null;
         PreparedStatement statement = null;
@@ -90,6 +107,11 @@ public class AbstractDAO <T>{
         return null;
     }
 
+    /**
+     * Uses reflection to instantiate and populate objects of type T from a ResultSet
+     * @param resultSet the restult set to read from
+     * @return a list of populated objects
+     */
     private List<T> createObjects(ResultSet resultSet) {
         List<T> list = new ArrayList<>();
         Constructor<?>[] ctors = type.getDeclaredConstructors();
@@ -136,7 +158,11 @@ public class AbstractDAO <T>{
         return list;
     }
 
-    //maybe break it down
+    /**
+     * Inserts a new object into the database.
+     * Automatically retrieves and sets the generated primary key.
+     * @param object the object to insert
+     */
     public void insert(T object){
         Connection connection = null;
         PreparedStatement statement = null;
@@ -189,6 +215,10 @@ public class AbstractDAO <T>{
         }
     }
 
+    /**
+     * Updates an existing object in the database based on its ID.
+     * @param object the object to update
+     */
     public void update(T object){
         Connection connection = null;
         PreparedStatement statement = null;
@@ -234,7 +264,12 @@ public class AbstractDAO <T>{
         }
     }
 
-    public void delete(T object){ //soft delete - due to FK and the requirement for for the order to still exist we can't actually delete things
+    /**
+     * Performs a soft delete by setting the status to DELETED.
+     * This preserves referential integrity in related tables (order).
+     * @param object the object to soft deleted
+     */
+    public void softDelete(T object){ //soft delete - due to FK and the requirement for for the order to still exist we can't actually delete things
         try{
             Field statusField = type.getDeclaredField("status");
             statusField.setAccessible(true);
@@ -242,6 +277,22 @@ public class AbstractDAO <T>{
             update(object);
         }catch (NoSuchFieldException | IllegalAccessException e){
             LOGGER.log(Level.WARNING, type.getName() + "DAO:delete (soft)" + e.getMessage());
+        }
+    }
+
+    /**
+     * Delete the object from the databases.
+     * This does not preserve referential integrity in related tables (order).
+     * @param id the id for the object to be deleted
+     */
+    public void hardDeleteById(int id){ //hard delete actually deletes the entry from the table (also deletes the tied orders)
+        String sql = "DELETE FROM " + type.getSimpleName() + " WHERE id = ?";
+        try (Connection connection = ConnectionFactory.getConnection(); PreparedStatement statement = connection.prepareStatement(sql))
+        {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e){
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:delete (hard)" + e.getMessage());
         }
     }
 }

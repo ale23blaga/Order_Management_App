@@ -1,7 +1,7 @@
 package org.example.Model;
 
 /**
- * Represents the status of an entity (active or soft-deleted).
+ * Represents the soft-deletion status of entities like Client or Product.
  */
 public enum Status {
     ACTIVE,

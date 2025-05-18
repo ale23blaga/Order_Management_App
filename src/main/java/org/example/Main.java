@@ -1,18 +1,21 @@
 package org.example;
 
-import org.example.Connection.ConnectionFactory;
-import org.example.Model.Student;
 import org.example.PresentatoinLayer.MainFrame;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
+/**
+ * Entry point of the Order Management application.
+ * <p>
+ * Launches the GUI by creating and displaying the {@link MainFrame}.
+ */
 public class Main {
-    private final static String findStatementString = "SELECT * FROM student WHERE id = ?";
 
+    /**
+     * Main method that starts the application.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();

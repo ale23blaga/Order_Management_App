@@ -12,6 +12,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * GUI panel for placing order between clients and products.
+ * <p>
+ *     Displays two tables for selecting a client and a product. Includes input for a quantity and a button to confirm an order. Upon placement, the product quantity is updated and a bill is generated.
+ * </p>
+ */
 public class OrderPanel extends JPanel {
     private final ClientBLL clientBLL = new ClientBLL();
     private final ProductBLL productBLL = new ProductBLL();
@@ -47,6 +53,10 @@ public class OrderPanel extends JPanel {
         bottom.add(orderButton);
         bottom.add(statusLabel);
 
+        /**
+         * Attempts to place a new order using the selected client and product and entered quantity.
+         * Validates input and updates tables. Also generates a bill on success.
+         */
         orderButton.addActionListener((ActionEvent e) -> {
            int clientRow = clientTable.getSelectedRow();
            int productRow = productTable.getSelectedRow();
@@ -75,6 +85,10 @@ public class OrderPanel extends JPanel {
         add(bottom, BorderLayout.SOUTH);
     }
 
+    /**
+     * Reloads the client and product table with the active data.
+     * This is typically called after an order is placed.
+     */
     private void refreshTables(){
         clientTable = new TableGenerator<Client>().generateTable(clientBLL.getAllActiveClients());
         clientTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -1,5 +1,9 @@
 package org.example.Model;
 
+/**
+ * Represents an order placed by a client for a specific product.
+ * Links client and product by ID and stores the requested quantity.
+ */
 public class Orders {
     private int id;
     private int clientId;

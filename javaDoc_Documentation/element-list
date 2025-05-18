@@ -1,0 +1,7 @@
+org.example
+org.example.BusinessLogic
+org.example.Connection
+org.example.DataAccess
+org.example.Model
+org.example.PresentatoinLayer
+org.example.Utilities

@@ -1,5 +1,9 @@
 package org.example.Model;
 
+/**
+ * Represents a client in the system.
+ * Contains identifying and contact information, as well as active/deleted status.
+ */
 public class Client {
     private int id;
     private String name;
