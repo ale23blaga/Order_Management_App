@@ -1,4 +1,6 @@
 package org.example.DataAccess;
 
-public class ClientDAO {
+import org.example.Model.Client;
+
+public class ClientDAO extends AbstractDAO<Client> {
 }
