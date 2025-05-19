@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 /**
  * Manages database connections using a singleton pattern.
- * <p>
  * Provides methods to open and close connections, statements, and result sets.
  * Automatically loads the MySQL JDBC driver.
  */
@@ -42,7 +41,6 @@ public class ConnectionFactory {
 
     /**
      * Returns a new connection to the database.
-     *
      * @return an active {@link java.sql.Connection} or {@code null} if the connection fails
      */
     public static Connection getConnection(){
@@ -51,7 +49,6 @@ public class ConnectionFactory {
 
     /**
      * Safely closes a {@link java.sql.Connection}, suppressing any SQL exceptions.
-     *
      * @param connection the connection to close
      */
     public static void close (Connection connection){
@@ -66,7 +63,6 @@ public class ConnectionFactory {
 
     /**
      * Safely closes a {@link java.sql.Statement}, suppressing any SQL exceptions.
-     *
      * @param statement the statement to close
      */
     public static void close(Statement statement){
@@ -81,7 +77,6 @@ public class ConnectionFactory {
 
     /**
      * Safely closes a {@link java.sql.ResultSet}, suppressing any SQL exceptions.
-     *
      * @param resultSet the result set to close
      */
     public static void close(ResultSet resultSet){

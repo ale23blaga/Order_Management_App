@@ -12,10 +12,22 @@ public class Client {
     private String phone;
     private Status status;
 
+    /**
+     * Construct a new Client with default status set to ACTIVE.
+     */
     public Client() {
         this.status = Status.ACTIVE;
     }
 
+    /**
+     * Construct a new Client with the specified details.
+     * Status is ACTIVE by default
+     * @param id the client's unique id
+     * @param name the client's name
+     * @param address the client's address
+     * @param email the client's email
+     * @param phone the client's phone number
+     */
     public Client(int id, String name, String address, String email, String phone) {
         this.id = id;
         this.name = name;
@@ -25,7 +37,6 @@ public class Client {
         this.status = Status.ACTIVE;
     }
 
-    // Getters and setters (include status)
     public int getId() {
         return id;
     }

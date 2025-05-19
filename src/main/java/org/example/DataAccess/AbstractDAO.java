@@ -33,6 +33,11 @@ public class AbstractDAO <T>{
         this.type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
+    /**
+     * Generates the select query.
+     * @param field the field the selection is based on
+     * @return the generated query
+     */
     private String createSelectQuery(String field){
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
@@ -43,13 +48,32 @@ public class AbstractDAO <T>{
         return sb.toString();
     }
 
-    private String createInsertQuery(String field){
-        StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ");
-        sb.append(type.getSimpleName());
-        sb.append(" (");
-        sb.append(field);
-        sb.append(") ");
+    /**
+     * Generates the inset query.
+     * @param fields provided fields name
+     * @param values provided placeholders vor values ("?,")
+     * @return the generated query
+     */
+    private String createInsertQuery(StringBuilder fields, StringBuilder values){
+        fields.setLength(fields.length()-1);
+        values.setLength(values.length()-1);
+        return "INSERT INTO " + type.getSimpleName() + " (" + fields + ") VALUES (" + values + ")";
+    }
+
+    /**
+     * Generates the update query.
+     * @return the generated query
+     */
+    private String createUpdateQuery(){
+        Field[] fields = type.getDeclaredFields();
+        StringBuilder sb = new StringBuilder("UPDATE " + type.getSimpleName() + " SET ");
+        for(Field f : fields){
+            if(!f.getName().equalsIgnoreCase("id")){
+                sb.append(f.getName()).append(" = ?,");
+            }
+        }
+        sb.setLength(sb.length()-1);
+        sb.append(" WHERE id = ?");
         return sb.toString();
     }
 
@@ -109,53 +133,61 @@ public class AbstractDAO <T>{
 
     /**
      * Uses reflection to instantiate and populate objects of type T from a ResultSet
-     * @param resultSet the restult set to read from
+     * @param resultSet the result set to read from
      * @return a list of populated objects
      */
-    private List<T> createObjects(ResultSet resultSet) {
+    private List<T> createObjects(ResultSet resultSet){
         List<T> list = new ArrayList<>();
-        Constructor<?>[] ctors = type.getDeclaredConstructors();
-        Constructor<?> ctor = null;
+        Constructor<?> constructor = getNoArgsConstructor();
 
-        for (Constructor<?> c : ctors) {
-            if (c.getParameterCount() == 0) {
-                ctor = c;
-                break;
-            }
-        }
-
-        if (ctor == null) {
-            throw new RuntimeException("No no-arg constructor found for " + type.getName());
-        }
-
-        try {
-            ctor.setAccessible(true);
-
-            while (resultSet.next()) {
-                T instance = (T) ctor.newInstance();
-
-                for (Field field : type.getDeclaredFields()) {
-                    String fieldName = field.getName();
-                    Object value = resultSet.getObject(fieldName);
-                    PropertyDescriptor pd = new PropertyDescriptor(fieldName, type);
-                    Method setter = pd.getWriteMethod();
-
-                    if (value != null && field.getType().isEnum() && value instanceof String) {
-                        Object enumValue = Enum.valueOf((Class<Enum>) field.getType(), value.toString());
-                        setter.invoke(instance, enumValue);
-                    } else {
-                        setter.invoke(instance, value);
-                    }
-                }
-
+        try{
+            constructor.setAccessible(true);
+            while(resultSet.next()){
+                T instance = (T) constructor.newInstance();
+                populateFieldsFromResultSet(instance, resultSet);
                 list.add(instance);
             }
-
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
         }
-
         return list;
+    }
+
+    /**
+     * Retrives the no-argument constructor of the current type.
+     * @return the no-argument constructor
+     */
+    private Constructor<?> getNoArgsConstructor(){
+        for(Constructor<?> constructor : type.getDeclaredConstructors()){
+            if(constructor.getParameterCount() == 0){
+                return constructor;
+            }
+        }
+        throw new RuntimeException("No noArgsConstructor found" + type.getName());
+    }
+
+    /**
+     * Populates fileds of the given object instance with values from the current Result set.
+     * Supports enum conversion when target field is an enum and the value is a String
+     * @param instance the object instance to populate
+     * @param resultSet the current ResultSet row
+     * @throws Exception if reflection or property access fails
+     */
+    private void populateFieldsFromResultSet(T instance, ResultSet resultSet) throws Exception{
+        for(Field field : type.getDeclaredFields()){
+            String fieldName = field.getName();
+            Object value = resultSet.getObject(fieldName);
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(fieldName, type);
+            Method setter = propertyDescriptor.getWriteMethod();
+
+            if(value != null && field.getType().isEnum() && value instanceof String){
+                Object enumValue = Enum.valueOf((Class<Enum>)field.getType(), value.toString());
+                setter.invoke(instance, enumValue);
+            }
+            else {
+                setter.invoke(instance, value);
+            }
+        }
     }
 
     /**
@@ -164,54 +196,72 @@ public class AbstractDAO <T>{
      * @param object the object to insert
      */
     public void insert(T object){
-        Connection connection = null;
-        PreparedStatement statement = null;
+        Field[] allFields = type.getDeclaredFields();
         StringBuilder fields = new StringBuilder();
         StringBuilder values = new StringBuilder();
 
-        Field[] allFields = type.getDeclaredFields();
-        for(Field field: allFields){
-            if(!field.getName().equalsIgnoreCase("id")) {
+        for(Field field : allFields){
+            if(!field.getName().equalsIgnoreCase("id")){
                 fields.append(field.getName()).append(",");
                 values.append("?,");
             }
         }
 
-        fields.setLength(fields.length() - 1); //remove ultima virgula
-        values.setLength(values.length() - 1);
+        String query = createInsertQuery(fields, values);
 
-        String query = "INSERT INTO " + type.getSimpleName() + " (" + fields + ") VALUES (" + values + ")";
+        Connection connection = null;
+        PreparedStatement statement = null;
 
-        try {
+        try{
             connection = ConnectionFactory.getConnection();
             statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
-            int paramIndex = 1;
-            for(Field field: allFields){
-                if(!field.getName().equalsIgnoreCase("id")) {
-                    field.setAccessible(true);
-                    Object value = field.get(object);
-                    if (value instanceof Enum<?>) {
-                        statement.setObject(paramIndex++, value.toString());
-                    } else {
-                        statement.setObject(paramIndex++, value);
-                    }
-                }
-            }
-            statement.executeUpdate();
 
-            //Retrive and set generated Id
-            ResultSet generatedKyes = statement.getGeneratedKeys();
-            if(generatedKyes.next()){
-                int generatedId = generatedKyes.getInt(1);
-                Field idField = type.getDeclaredField("id");
-                idField.setAccessible(true);
-                idField.set(object, generatedId);
-            }
+            setPreparedStatementValues(statement, allFields, object);
+            statement.executeUpdate();
+            setGeneratedId(statement, object);
+
         }catch(SQLException | IllegalAccessException | NoSuchFieldException e){
-            LOGGER.log(Level.WARNING, type.getName() + "DAO:insert" + e.getMessage());
+            LOGGER.log(Level.WARNING, type.getName() + "DAO: insert " + e.getMessage());
         }finally{
             ConnectionFactory.close(statement);
             ConnectionFactory.close(connection);
+        }
+    }
+
+    /**
+     * Sets the values of a PreparedStatement based on the fields of the given object.
+     * @param statement the PreparedStatement to populate
+     * @param fields the array of fields to retrive values from
+     * @param object the object containing values to insert
+     * @throws IllegalAccessException if field access is denied
+     * @throws SQLException if setting a parameter fails
+     */
+    private void setPreparedStatementValues(PreparedStatement statement, Field[] fields, T object) throws IllegalAccessException, SQLException {
+        int i = 1;
+        for(Field field : fields){
+            if(!field.getName().equalsIgnoreCase("id")){
+                field.setAccessible(true);
+                Object value = field.get(object);
+                statement.setObject(i++, (value instanceof Enum<?>) ? value.toString() : value );
+            }
+        }
+    }
+
+    /**
+     * Retrives the auto-generated id after insert.
+     * @param statement the statement used for the insert
+     * @param object the object whose ID field will be updated
+     * @throws SQLException if result set operation fail
+     * @throws NoSuchFieldException if the "Id" field is missing
+     * @throws IllegalAccessException if setting the field fails
+     */
+    private void setGeneratedId(PreparedStatement statement, T object) throws SQLException, NoSuchFieldException, IllegalAccessException{
+        ResultSet rs = statement.getGeneratedKeys();
+        if(rs.next()){
+            int id = rs.getInt(1);
+            Field idField = type.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(object, id);
         }
     }
 
@@ -220,48 +270,37 @@ public class AbstractDAO <T>{
      * @param object the object to update
      */
     public void update(T object){
-        Connection connection = null;
-        PreparedStatement statement = null;
-        StringBuilder sb = new StringBuilder();
-        Field[] fields = type.getDeclaredFields();
-
-        sb.append("UPDATE ").append(type.getSimpleName()).append(" SET ");
-        for(Field field: fields){
-            if(!field.getName().equalsIgnoreCase("id")) {
-                sb.append(field.getName()).append("=?,");
-            }
-        }
-        sb.setLength(sb.length() - 1);
-        sb.append("WHERE id = ?");
-
-        try{
-            connection = ConnectionFactory.getConnection();
-            statement = connection.prepareStatement(sb.toString());
-
-            int i = 1;
-            for(Field field: fields){
-                if(!field.getName().equalsIgnoreCase("id")) {
-                    field.setAccessible(true);
-                    Object value = field.get(object);
-                    if(value instanceof Enum<?>) {
-                        statement.setObject(i++, value.toString());
-                    }
-                    else
-                        statement.setObject(i++, value);
-                }
-            }
-
-            Field idField = type.getDeclaredField("id");
-            idField.setAccessible(true);
-            statement.setObject(i, idField.get(object));
-
+        String query = createUpdateQuery();
+        try(Connection connection = ConnectionFactory.getConnection();
+        PreparedStatement statement = connection.prepareStatement(query)){
+            setUpdateStatementValues(statement, object);
             statement.executeUpdate();
-        }catch (SQLException | IllegalAccessException | NoSuchFieldException e){
-            LOGGER.log(Level.WARNING, type.getName() + "DAO:update" + e.getMessage());
-        }finally{
-            ConnectionFactory.close(statement);
-            ConnectionFactory.close(connection);
+        }catch(SQLException | IllegalAccessException | NoSuchFieldException e){
+            LOGGER.log(Level.WARNING, type.getName() + "DAO: update " + e.getMessage());
         }
+    }
+
+    /**
+     * Sets the parameters of a PreparedStatement for an update operation. Does not update id.
+     * @param statement the statement to complete
+     * @param object the object containing updated values
+     * @throws IllegalAccessException if field access is denied
+     * @throws SQLException if setting a parameter fails
+     * @throws NoSuchFieldException if "id" field is missing
+     */
+    private void setUpdateStatementValues(PreparedStatement statement, T object) throws IllegalAccessException, SQLException, NoSuchFieldException {
+        Field[] fields = type.getDeclaredFields();
+        int i = 1;
+        for(Field field : fields){
+            if(!field.getName().equalsIgnoreCase("id")){
+                field.setAccessible(true);
+                Object value = field.get(object);
+                statement.setObject(i++, (value instanceof Enum<?>) ? value.toString() : value );
+            }
+        }
+        Field idField = type.getDeclaredField("id");
+        idField.setAccessible(true);
+        statement.setObject(i, idField.get(object));
     }
 
     /**

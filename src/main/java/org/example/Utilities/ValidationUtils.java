@@ -8,7 +8,6 @@ public class ValidationUtils {
 
     /**
      * Validates whether a string is a properly formatted email address.
-     *
      * @param email the email string to validate
      * @return true if the email is valid
      */
@@ -18,7 +17,6 @@ public class ValidationUtils {
 
     /**
      * Validates whether a string is a valid phone number (digits only, 10+ characters).
-     *
      * @param phone the phone number string
      * @return true if the phone number is valid
      */
@@ -28,7 +26,6 @@ public class ValidationUtils {
 
     /**
      * Checks if a string is not null and not blank.
-     *
      * @param str the string to check
      * @return true if the string is not null or blank
      */

@@ -10,9 +10,7 @@ import java.util.List;
 
 /**
  * Business Logic Layer for Orders.
- * <p>
- *     Delegates data access to {@link OrderDAO} and performs validation or filtration.
- * </p>
+ * Delegates data access to {@link OrderDAO} and performs validation or filtration.
  */
 public class OrderBLL {
     private final OrderDAO orderDAO = new OrderDAO();
@@ -22,7 +20,6 @@ public class OrderBLL {
 
     /**
      * Retrieves all Orders, including soft-deleted ones.
-     *
      * @return list of all Orders
      */
     public List<Orders> getAllOrders() {

@@ -10,6 +10,13 @@ public class Orders {
     private int productId;
     private int quantity;
 
+    /**
+     * Construct a new Order with the specified details.
+     * @param id the order's id
+     * @param clientId the id of the client who placed he order.
+     * @param productId the id of the product for which the order is placed.
+     * @param quantity the quantity of the product that is ordered
+     */
     public Orders(int id, int clientId, int productId, int quantity) {
         this.id = id;
         this.clientId = clientId;

@@ -14,7 +14,6 @@ public class BillBLL {
 
     /**
      * Retrieves all bills from the log table.
-     *
      * @return list of {@link Bill} records
      */
     public List<Bill> getAllBills(){

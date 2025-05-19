@@ -9,10 +9,8 @@ import java.awt.*;
 
 /**
  * Main GUI frame for the Order Management app.
- * <p>
  *     Contains navigation buttons for switching between Clients, Products,
  *     Orders, and Bills panels using a CardLayout.
- * </p>
  */
 public class MainFrame  extends JFrame {
     private final JPanel cardPanel;

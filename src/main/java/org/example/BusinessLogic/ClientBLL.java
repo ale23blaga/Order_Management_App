@@ -9,16 +9,13 @@ import java.util.stream.Collectors;
 
 /**
  * Business Logic Layer for Client operations.
- * <p>
- *     Delegates data acess to {@link ClientDAO} and performs validation or filtering as needed.
- * </p>
+ * Delegates data acess to {@link ClientDAO} and performs validation or filtering as needed.
  */
 public class ClientBLL {
     private final ClientDAO clientDAO = new ClientDAO();
 
     /**
      * Retrieves all clients, including soft-deleted ones.
-     *
      * @return list of all clients
      */
     public List<Client> getAllClients(){
@@ -28,7 +25,6 @@ public class ClientBLL {
 
     /**
      * Retrieves only clients marked as active.
-     *
      * @return list of active clients
      */
     public List<Client> getAllActiveClients(){
@@ -40,7 +36,6 @@ public class ClientBLL {
 
     /**
      * Inserts a new client into the database.
-     *
      * @param client the client to add
      */
     public void addClient(Client client) {
@@ -49,7 +44,6 @@ public class ClientBLL {
 
     /**
      * Updates an existing client's information.
-     *
      * @param client the client with updated fields
      */
     public void updateClient(Client client) {
@@ -58,7 +52,6 @@ public class ClientBLL {
 
     /**
      * Soft-deletes a client by marking them as {@code Status.DELETED}.
-     *
      * @param client the client to mark as deleted
      */
     public void softDeleteClient(Client client) {
@@ -76,7 +69,6 @@ public class ClientBLL {
 
     /**
      * Completely removes a client and all their orders from the database.
-     *
      * @param id the ID of the client to delete
      */
     public void hardDeleteById(int id){

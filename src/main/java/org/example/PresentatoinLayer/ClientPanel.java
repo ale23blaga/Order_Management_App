@@ -11,10 +11,8 @@ import java.util.List;
 
 /**
  * GUI panel for displaying and managing clients.
- * <p>
  *     Provides controls to add, update, delete, and hard delete clients.
  *     Also supports viewing all clients or only active clients (not soft deleted ones).
- * </p>
  */
 
 public class ClientPanel extends JPanel {

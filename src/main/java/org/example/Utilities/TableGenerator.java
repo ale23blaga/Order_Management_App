@@ -9,16 +9,13 @@ import java.util.List;
 
 /**
  * Utility class to generate a {@link javax.swing.JTable} dynamically from a list of objects.
- * <p>
  * Supports both standard Java classes and Java records using reflection.
- *
  * @param <T> the type of objects to display in the table
  */
 public class TableGenerator<T> {
 
     /**
      * Generates a JTable based on the fields or record components of the given objects.
-     *
      * @param objectList the list of objects to convert into table rows
      * @return a populated JTable, or an empty table if the list is null or empty
      */

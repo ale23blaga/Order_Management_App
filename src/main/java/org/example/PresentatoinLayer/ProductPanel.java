@@ -10,10 +10,8 @@ import java.util.List;
 
 /**
  * GUI panel for displaying and managing products.
- * <p>
- *     Provides controls to add, update, delete, and hard delete products.
- *     Also supports viewing all products or only the only active products.
- * </p>
+ * Provides controls to add, update, delete, and hard delete products.
+ * Also supports viewing all products or only the only active products.
  */
 
 public class ProductPanel extends JPanel {

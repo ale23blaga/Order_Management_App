@@ -14,9 +14,7 @@ import com.lowagie.text.pdf.*;
 
 /**
  * GUI panel for viewing all the generated bills.
- * <p>
  *     Provied functinality to export a selected bill to a PDF file.
- * </p>
  */
 public class BillPanel extends JPanel {
     //sa faci pannel ca sa vezi toate bills
