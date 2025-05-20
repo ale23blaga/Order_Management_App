@@ -3,6 +3,7 @@ package org.example.PresentatoinLayer;
 import org.example.BusinessLogic.ProductBLL;
 import org.example.Model.Product;
 import org.example.Utilities.TableGenerator;
+import org.example.Utilities.ValidationUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,10 +72,16 @@ public class ProductPanel extends JPanel {
         int result = JOptionPane.showConfirmDialog(null, inputs, "Add Product", JOptionPane.YES_NO_OPTION);
         if(result == JOptionPane.YES_OPTION) {
             try{
-                int qty = Integer.parseInt(quantity.getText());
-                double prc = Double.parseDouble(price.getText());
-                productBLL.addProduct(new Product(0, name.getText(), qty, prc));
-                refreshTable();
+                Integer qty = Integer.parseInt(quantity.getText());
+                Double prc = Double.parseDouble(price.getText());
+                if(!ValidationUtils.isPositiveNumber(qty.toString()) || !ValidationUtils.isPositiveNumber(prc.toString())) {
+                    JOptionPane.showMessageDialog(null, "Please enter a positive number");
+                }
+                else
+                {
+                    productBLL.addProduct(new Product(0, name.getText(), qty, prc));
+                    refreshTable();
+                }
             }catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(null, "Invalid quantity or price");
             }

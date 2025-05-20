@@ -17,9 +17,9 @@ public class Main {
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+
             MainFrame frame = new MainFrame();
             frame.setVisible(true);
-        });
+
     }
 }
