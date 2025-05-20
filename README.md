@@ -1,4 +1,4 @@
-# Queue Simulation App
+# Order Managment App
 
 ## Overview
 The **Order Managment App** is a Java-based application that allows users to add clients, products, make orders, and generate bills.
