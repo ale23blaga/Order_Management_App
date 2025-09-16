@@ -22,7 +22,8 @@ The **Order Managment App** is a Java-based application that allows users to add
 5. Update clients or products
 6. Delete clients or products
 
-##Development Notes
+## Development Notes
+JavaDOC included
 UML Diagrams included:
 - Package Diagram
 - Class Diagram
@@ -30,3 +31,4 @@ UML Diagrams included:
 
 ## Contributors
 - Blaga Alexandra
+
