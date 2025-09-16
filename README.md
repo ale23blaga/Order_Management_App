@@ -29,6 +29,7 @@ JavaDOC and UML Diagrams included:
 - Use Case Diagram
 
 ## Contributors
-- Blaga Alexandra
+- [Blaga Alexandra](https://github.com/ale23blaga)
+
 
 
