@@ -23,12 +23,12 @@ The **Order Managment App** is a Java-based application that allows users to add
 6. Delete clients or products
 
 ## Development Notes
-JavaDOC included
-UML Diagrams included:
+JavaDOC and UML Diagrams included:
 - Package Diagram
 - Class Diagram
 - Use Case Diagram
 
 ## Contributors
 - Blaga Alexandra
+
 
